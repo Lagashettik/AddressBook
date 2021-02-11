@@ -14,7 +14,7 @@ public class AddressBook {
     void Begin(){
         int choice = 1;
         while (choice != 0) {
-            System.out.println("1:Create or Add new Contact\n2:Edit Contact using Person First Name");
+            System.out.println("1:Create or Add new Contact\n2:Edit Contact using Person First Name\n3:Delete Contact using Person First Name");
             System.out.println("0:Exit Program");
             System.out.println("Enter Your Choice");
             choice = scan.nextInt();
@@ -23,7 +23,11 @@ public class AddressBook {
                     CreateContact();
                     break;
                 case 2:
-                    EditContactUsingName();
+                    EditContactUsingName("Edit");
+                    break;
+                case 3:
+                    EditContactUsingName("Delete");
+                    break;
                 case 0:
                     System.out.println("Successfully exited");
                     choice = 0;
@@ -73,13 +77,18 @@ public class AddressBook {
         Adrlst.add(Adr);
     }
 
-    void EditContactUsingName(){
+    void EditContactUsingName(String Operation){
+        try {
         System.out.println("Enter Person Name : ");
         int Index = CheckPersonIndex(scan.next());
         if(Index == -1)
             System.out.println("Person Not exist\nCreate contact");
         else
-            EditOrDeleteContact(Index,"Edit");
+            EditOrDeleteContact(Index,Operation);
+        }
+        catch (NullPointerException e){
+            System.out.println("Address Book is Empty");
+        }
     }
 
     int CheckPersonIndex(String Name){
@@ -92,7 +101,7 @@ public class AddressBook {
     }
 
     void EditOrDeleteContact(int index, String choice) {
-        if(choice == "Edit"){
+        if(choice.equals("Edit")){
             System.out.println("First Name : ");
             Adr.setFirstName(scan.next());
 
@@ -126,6 +135,9 @@ public class AddressBook {
             }
             Adrlst.set(index,Adr);
             System.out.println("Successfully Contact Edited");
+        }
+        if(choice.equals("Delete")){
+            Adrlst.remove(index);
         }
     }
 
