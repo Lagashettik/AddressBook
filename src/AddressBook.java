@@ -1,9 +1,10 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class AddressBook {
     public static Scanner scan = new Scanner(System.in);
-    static ArrayList<AddressBookData> Adrlst = new ArrayList();
+    static ArrayList<AddressBookData> Adrlst = new ArrayList<AddressBookData>();
     static AddressBookData Adr = new AddressBookData();
 
     AddressBook(){
@@ -11,18 +12,25 @@ public class AddressBook {
     }
 
     void Begin(){
-        System.out.println("Enter Your Choice");
-        System.out.println("1:Create or Add new Contact");
-        System.out.println("0:Exit Program");
-        int choice = scan.nextInt();
-        switch (choice){
-            case 1 : CreateContact();
-                break;
-            case 0 :
-                System.out.println("Successfully exited");
-                break;
-            default:
-                System.out.println("Enter Correct Option");
+        int choice = 1;
+        while (choice != 0) {
+            System.out.println("1:Create or Add new Contact\n2:Edit Contact using Person First Name");
+            System.out.println("0:Exit Program");
+            System.out.println("Enter Your Choice");
+            choice = scan.nextInt();
+            switch (choice) {
+                case 1:
+                    CreateContact();
+                    break;
+                case 2:
+                    EditContactUsingName();
+                case 0:
+                    System.out.println("Successfully exited");
+                    choice = 0;
+                    break;
+                default:
+                    System.out.println("Enter Correct Option");
+            }
         }
     }
 
@@ -45,13 +53,80 @@ public class AddressBook {
         System.out.println("Email : ");
         Adr.Email = scan.next();
 
-        System.out.println("Zip Code : ");
-        Adr.Zip = scan.nextInt();
+        try {
+            System.out.println("Zip Code : ");
+            Adr.setZip(scan.nextInt());
 
-        System.out.println("Phone Number : ");
-        Adr.PhNo = scan.nextInt();
+            System.out.println("Phone Number : ");
+            Adr.setPhNo(scan.nextLong());
+        }
+        catch (InputMismatchException ex){
+            System.out.println("Enter Only Number");
+
+            System.out.println("Zip Code : ");
+            Adr.setZip(scan.nextInt());
+
+            System.out.println("Phone Number : ");
+            Adr.setPhNo(scan.nextLong());
+        }
 
         Adrlst.add(Adr);
+    }
+
+    void EditContactUsingName(){
+        System.out.println("Enter Person Name : ");
+        int Index = CheckPersonIndex(scan.next());
+        if(Index == -1)
+            System.out.println("Person Not exist\nCreate contact");
+        else
+            EditOrDeleteContact(Index,"Edit");
+    }
+
+    int CheckPersonIndex(String Name){
+        int index = -1;
+        for (AddressBookData adr : Adrlst) {
+            if(Name.equals(adr.FirstName))
+                index = Adrlst.indexOf(adr);
+        }
+        return index;
+    }
+
+    void EditOrDeleteContact(int index, String choice) {
+        if(choice == "Edit"){
+            System.out.println("First Name : ");
+            Adr.setFirstName(scan.next());
+
+            System.out.println("Last Name : ");
+            Adr.setLastName(scan.next());
+
+            System.out.println("Address : ");
+            Adr.setAddress(scan.nextLine());
+
+            System.out.println("City : ");
+            Adr.setCity(scan.next());
+
+            System.out.println("State : ");
+            Adr.setEmail(scan.next());
+
+            try {
+                System.out.println("Zip Code : ");
+                Adr.setZip(scan.nextInt());
+
+                System.out.println("Phone Number : ");
+                Adr.setPhNo(scan.nextLong());
+            }
+            catch (InputMismatchException ex){
+                System.out.println("Enter Only Number");
+
+                System.out.println("Zip Code : ");
+                Adr.setZip(scan.nextInt());
+
+                System.out.println("Phone Number : ");
+                Adr.setPhNo(scan.nextLong());
+            }
+            Adrlst.set(index,Adr);
+            System.out.println("Successfully Contact Edited");
+        }
     }
 
     public static void main(String[] args) {
