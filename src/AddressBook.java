@@ -12,7 +12,7 @@ public class AddressBook {
 
     void Begin(){
         System.out.println("Enter Your Choice");
-        System.out.println("1:Create Contact");
+        System.out.println("1:Create or Add new Contact");
         System.out.println("0:Exit Program");
         int choice = scan.nextInt();
         switch (choice){
