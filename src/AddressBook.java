@@ -3,33 +3,49 @@ import java.util.*;
 
 public class AddressBook {
     public static Scanner scan = new Scanner(System.in);
-    static ArrayList<AddressBookData> Adrlst = new ArrayList<AddressBookData>();
-    static AddressBookData Adr = new AddressBookData();
+    private static ArrayList<AddressBookData> Adrlst = new ArrayList<AddressBookData>();
+    private static AddressBookData Adr = new AddressBookData();
 
     void CreateContact(){
+
+        if(!CheckDuplicate()) {
+
+            System.out.println("Address : ");
+            scan.nextLine();
+            Adr.Address = scan.nextLine();
+
+            System.out.println("City : ");
+            Adr.City = scan.next();
+
+            System.out.println("State : ");
+            Adr.State = scan.next();
+
+            System.out.println("Email : ");
+            Adr.Email = scan.next();
+
+            GetCorrectZip();
+            GetCorrectPhNo();
+
+            Adrlst.add(Adr);
+        }
+        else {
+            Adr.FirstName = "";
+            Adr.LastName = "";
+        }
+    }
+
+    boolean CheckDuplicate(){
         System.out.println("Enter Following Details: \nFirstName : ");
         Adr.FirstName = scan.next();
-
         System.out.println("LastName : ");
         Adr.LastName = scan.next();
-
-        System.out.println("Address : ");
-        scan.nextLine();
-        Adr.Address = scan.nextLine();
-
-        System.out.println("City : ");
-        Adr.City = scan.next();
-
-        System.out.println("State : ");
-        Adr.State = scan.next();
-
-        System.out.println("Email : ");
-        Adr.Email = scan.next();
-
-        GetCorrectZip();
-        GetCorrectPhNo();
-
-        Adrlst.add(Adr);
+        for (AddressBookData adr:Adrlst) {
+            if(adr.FirstName.equals(Adr.FirstName) && adr.LastName.equals(Adr.LastName)){
+                System.out.println("You entered person details already exists");
+                return true;
+            }
+        }
+        return false;
     }
 
     void EditContactUsingName(String Operation){
