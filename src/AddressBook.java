@@ -1,42 +1,10 @@
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+
+import java.util.*;
 
 public class AddressBook {
     public static Scanner scan = new Scanner(System.in);
     static ArrayList<AddressBookData> Adrlst = new ArrayList<AddressBookData>();
     static AddressBookData Adr = new AddressBookData();
-
-    AddressBook(){
-        System.out.println("Welcome to Address Book Program");
-    }
-
-    void Begin(){
-        int choice = 1;
-        while (choice != 0) {
-            System.out.println("1:Create or Add new Contact\n2:Edit Contact using Person First Name\n3:Delete Contact using Person First Name");
-            System.out.println("0:Exit Program");
-            System.out.println("Enter Your Choice");
-            choice = scan.nextInt();
-            switch (choice) {
-                case 1:
-                    CreateContact();
-                    break;
-                case 2:
-                    EditContactUsingName("Edit");
-                    break;
-                case 3:
-                    EditContactUsingName("Delete");
-                    break;
-                case 0:
-                    System.out.println("Successfully exited");
-                    choice = 0;
-                    break;
-                default:
-                    System.out.println("Enter Correct Option");
-            }
-        }
-    }
 
     void CreateContact(){
         System.out.println("Enter Following Details: \nFirstName : ");
@@ -46,6 +14,7 @@ public class AddressBook {
         Adr.LastName = scan.next();
 
         System.out.println("Address : ");
+        scan.nextLine();
         Adr.Address = scan.nextLine();
 
         System.out.println("City : ");
@@ -57,22 +26,8 @@ public class AddressBook {
         System.out.println("Email : ");
         Adr.Email = scan.next();
 
-        try {
-            System.out.println("Zip Code : ");
-            Adr.setZip(scan.nextInt());
-
-            System.out.println("Phone Number : ");
-            Adr.setPhNo(scan.nextLong());
-        }
-        catch (InputMismatchException ex){
-            System.out.println("Enter Only Number");
-
-            System.out.println("Zip Code : ");
-            Adr.setZip(scan.nextInt());
-
-            System.out.println("Phone Number : ");
-            Adr.setPhNo(scan.nextLong());
-        }
+        GetCorrectZip();
+        GetCorrectPhNo();
 
         Adrlst.add(Adr);
     }
@@ -117,33 +72,43 @@ public class AddressBook {
             System.out.println("State : ");
             Adr.setEmail(scan.next());
 
-            try {
-                System.out.println("Zip Code : ");
-                Adr.setZip(scan.nextInt());
+            GetCorrectZip();
+            GetCorrectPhNo();
 
-                System.out.println("Phone Number : ");
-                Adr.setPhNo(scan.nextLong());
-            }
-            catch (InputMismatchException ex){
-                System.out.println("Enter Only Number");
-
-                System.out.println("Zip Code : ");
-                Adr.setZip(scan.nextInt());
-
-                System.out.println("Phone Number : ");
-                Adr.setPhNo(scan.nextLong());
-            }
             Adrlst.set(index,Adr);
             System.out.println("Successfully Contact Edited");
         }
+
         if(choice.equals("Delete")){
             Adrlst.remove(index);
         }
     }
 
+    void GetCorrectZip(){
+        try {
+
+            System.out.println("Zip Code : ");
+            Adr.setZip(new UserInputOutput().inputint());
+        }
+        catch (InputMismatchException ex){
+           GetCorrectZip();
+        }
+    }
+
+    void GetCorrectPhNo(){
+        try {
+
+            System.out.println("Phone Number : ");
+            Adr.setPhNo(new UserInputOutput().inputint());
+        }
+        catch (InputMismatchException ex){
+            GetCorrectPhNo();
+        }
+    }
+
     public static void main(String[] args) {
-        AddressBook Adr =new AddressBook();
-        Adr.Begin();
+        AddressBookHashTable addressBookHashTable =new AddressBookHashTable();
+        addressBookHashTable.Start();
     }
 }
 
@@ -219,6 +184,105 @@ class AddressBookData{
 
     public void setPhNo(long phNo) {
         PhNo = phNo;
+    }
+
+}
+
+class AddressBookHashTable {
+    Hashtable<String,AddressBook> AddressBookTable = new Hashtable<String,AddressBook>();    //Table of AddressBook
+    public static Scanner scan = new Scanner(System.in);
+    String addressBookName;
+
+    AddressBookHashTable(){
+        System.out.println("Welcome to Address Book Program");
+    }
+
+    void Start() {
+        if(AddressBookTable.isEmpty()) {
+            System.out.println("Enter First Address book name : ");
+            addressBookName = scan.next();
+            AddressBookTable.put(addressBookName,new AddressBook());
+            Begin();
+        }
+        else {
+            System.out.println("Enter Existing Address book Name/n Press 0 to enter");
+            addressBookName = scan.next();
+            switch (Integer.parseInt(addressBookName)){
+                case 0:
+                    System.out.println("Exit");
+                    break;
+                default:
+                    if (AddressBookTable.get(addressBookName) == null){
+                        System.out.println("Entered address book name is wrong");
+                        System.out.println("Re-Enter Address book name");
+                        addressBookName = scan.next();
+                    }
+                    else {
+                        Begin();
+                    }
+            }
+        }
+    }
+    void Begin() {
+        int choice = 1;
+        while (choice != 0) {
+            System.out.println("1:Create or Add new Contact\n2:Edit Contact using Person First Name\n3:Delete Contact using Person First Name");
+            System.out.println("4:Create new AddressBook\n0:Exit Program");
+            System.out.println("Enter your choice : ");
+            choice = new UserInputOutput().getint();
+
+            switch (choice){
+                case 1:
+                    AddressBookTable.get(addressBookName).CreateContact();
+                    break;
+                case 2: AddressBookTable.get(addressBookName).EditContactUsingName("Edit");
+                    break;
+                case 3: AddressBookTable.get(addressBookName).EditContactUsingName("Delete");
+                    break;
+                case 4: newAddressBook();
+                    break;
+                case 0:
+                    System.out.println("Exited");
+                    break;
+                default:
+                    System.out.println("Enter correct choice");
+            }
+        }
+    }
+
+    void newAddressBook(){
+        System.out.println("Enter Address book name : ");
+        String Name = scan.next();
+        if(AddressBookTable.containsKey(Name)){
+            System.out.println("Address Book of this name already exits\nUse new name");
+        }
+        else {
+            AddressBookTable.put(Name,new AddressBook());
+            addressBookName = Name;
+        }
+    }
+
+}
+
+class UserInputOutput {
+    int a;
+    public int getint(){
+        try {
+            a = new UserInputOutput().inputint();
+        }
+        catch (InputMismatchException ex){
+            System.out.println("Enter only number");
+            getint();
+        }
+        finally {
+            return a;}
+
+    }
+
+    public int inputint(){
+        Scanner scan = new Scanner(System.in);
+        int value = scan.nextInt();
+        return value;
     }
 
 }
