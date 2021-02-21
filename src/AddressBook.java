@@ -3,49 +3,39 @@ import java.util.*;
 
 public class AddressBook {
     public static Scanner scan = new Scanner(System.in);
-    private static ArrayList<AddressBookData> Adrlst = new ArrayList<AddressBookData>();
-    private static AddressBookData Adr = new AddressBookData();
+    private ArrayList<Person> addressbook = new ArrayList<>();
 
     void CreateContact(){
+        Person data = new Person();
 
-        if(!CheckDuplicate()) {
+        System.out.println("Enter Following Details: \nFirstName : ");
+        data.setFirstName(scan.next());
 
+        System.out.println("LastName : ");
+        data.setLastName(scan.next());
+
+        if (!addressbook.contains(data)) {
             System.out.println("Address : ");
             scan.nextLine();
-            Adr.Address = scan.nextLine();
+            data.setAddress(scan.nextLine());
 
             System.out.println("City : ");
-            Adr.City = scan.next();
+            data.setCity(scan.next());
 
             System.out.println("State : ");
-            Adr.State = scan.next();
+            data.setState(scan.next());
 
             System.out.println("Email : ");
-            Adr.Email = scan.next();
+            data.setEmail(scan.next());
 
-            GetCorrectZip();
-            GetCorrectPhNo();
+            GetCorrectZip(data);
+            GetCorrectPhNo(data);
 
-            Adrlst.add(Adr);
+            addressbook.add(data);
         }
-        else {
-            Adr.FirstName = "";
-            Adr.LastName = "";
-        }
-    }
+        else
+            System.out.println("Entered Person already exist in this address book");
 
-    boolean CheckDuplicate(){
-        System.out.println("Enter Following Details: \nFirstName : ");
-        Adr.FirstName = scan.next();
-        System.out.println("LastName : ");
-        Adr.LastName = scan.next();
-        for (AddressBookData adr:Adrlst) {
-            if(adr.FirstName.equals(Adr.FirstName) && adr.LastName.equals(Adr.LastName)){
-                System.out.println("You entered person details already exists");
-                return true;
-            }
-        }
-        return false;
     }
 
     void EditContactUsingName(String Operation){
@@ -64,241 +54,88 @@ public class AddressBook {
 
     int CheckPersonIndex(String Name){
         int index = -1;
-        for (AddressBookData adr : Adrlst) {
-            if(Name.equals(adr.FirstName))
-                index = Adrlst.indexOf(adr);
+        for (Person adr : addressbook) {
+            if(Name.equals(adr.getFirstName()))
+                index = addressbook.indexOf(adr);
         }
         return index;
     }
 
     void EditOrDeleteContact(int index, String choice) {
         if(choice.equals("Edit")){
+            Person data = new Person();
             System.out.println("First Name : ");
-            Adr.setFirstName(scan.next());
+            data.setFirstName(scan.next());
 
             System.out.println("Last Name : ");
-            Adr.setLastName(scan.next());
+            data.setLastName(scan.next());
 
             System.out.println("Address : ");
-            Adr.setAddress(scan.nextLine());
+            data.setAddress(scan.nextLine());
 
             System.out.println("City : ");
-            Adr.setCity(scan.next());
+            data.setCity(scan.next());
 
             System.out.println("State : ");
-            Adr.setEmail(scan.next());
+            data.setEmail(scan.next());
 
-            GetCorrectZip();
-            GetCorrectPhNo();
+            GetCorrectZip(data);
+            GetCorrectPhNo(data);
 
-            Adrlst.set(index,Adr);
+            addressbook.set(index, data);
             System.out.println("Successfully Contact Edited");
         }
 
         if(choice.equals("Delete")){
-            Adrlst.remove(index);
+            addressbook.remove(index);
         }
     }
 
-    void GetCorrectZip(){
+    void GetCorrectZip(Person data){
         try {
 
             System.out.println("Zip Code : ");
-            Adr.setZip(new UserInputOutput().inputint());
+            data.setZip(new UserInputOutput().inputint());
         }
         catch (InputMismatchException ex){
-           GetCorrectZip();
+           GetCorrectZip(data);
         }
     }
 
-    void GetCorrectPhNo(){
+    void GetCorrectPhNo(Person data){
         try {
 
             System.out.println("Phone Number : ");
-            Adr.setPhNo(new UserInputOutput().inputint());
+            data.setPhNo(new UserInputOutput().inputint());
         }
         catch (InputMismatchException ex){
-            GetCorrectPhNo();
+            GetCorrectPhNo(data);
         }
     }
+
+    boolean searchInAddressBook(String firstname, String lastname, String city){
+        for(Person data : addressbook){
+            if((data.getFirstName().equals(firstname) && data.getLastName().equals(lastname)) && (data.getCity().equals(city) || data.getState().equals(city)))
+                return true;
+        }
+        return false;
+    }
+
+//    void display(){
+//        for (Person person : addressbook){
+//            System.out.println("Firstname : "+person.getFirstName());
+//            System.out.println("Lastname : "+person.getLastName());
+//            System.out.println("Address : "+person.getAddress());
+//            System.out.println("City : "+person.getCity());
+//            System.out.println("State : "+person.getState());
+//            System.out.println("Email : "+person.getEmail());
+//            System.out.println("Zip : "+person.getZip());
+//            System.out.println("Phone Number : "+person.getPhNo());
+//        }
+//    }
 
     public static void main(String[] args) {
         AddressBookHashTable addressBookHashTable =new AddressBookHashTable();
         addressBookHashTable.Start();
     }
-}
-
-class AddressBookData{
-    String FirstName;
-    String LastName;
-    String Address;
-    String City;
-    String State;
-    String Email;
-    int Zip;
-    long PhNo;
-
-    public String getFirstName() {
-        return FirstName;
-    }
-
-    public String getLastName() {
-        return LastName;
-    }
-
-    public String getAddress() {
-        return Address;
-    }
-
-    public String getCity() {
-        return City;
-    }
-
-    public String getState() {
-        return State;
-    }
-
-    public String getEmail() {
-        return Email;
-    }
-
-    public int getZip() {
-        return Zip;
-    }
-
-    public long getPhNo() {
-        return PhNo;
-    }
-
-    public void setFirstName(String firstName) {
-        FirstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        LastName = lastName;
-    }
-
-    public void setAddress(String address) {
-        Address = address;
-    }
-
-    public void setCity(String city) {
-        City = city;
-    }
-
-    public void setState(String state) {
-        State = state;
-    }
-
-    public void setEmail(String email) {
-        Email = email;
-    }
-
-    public void setZip(int zip) {
-        Zip = zip;
-    }
-
-    public void setPhNo(long phNo) {
-        PhNo = phNo;
-    }
-
-}
-
-class AddressBookHashTable {
-    Hashtable<String,AddressBook> AddressBookTable = new Hashtable<String,AddressBook>();    //Table of AddressBook
-    public static Scanner scan = new Scanner(System.in);
-    String addressBookName;
-
-    AddressBookHashTable(){
-        System.out.println("Welcome to Address Book Program");
-    }
-
-    void Start() {
-        if(AddressBookTable.isEmpty()) {
-            System.out.println("Enter First Address book name : ");
-            addressBookName = scan.next();
-            AddressBookTable.put(addressBookName,new AddressBook());
-            Begin();
-        }
-        else {
-            System.out.println("Enter Existing Address book Name/n Press 0 to enter");
-            addressBookName = scan.next();
-            switch (Integer.parseInt(addressBookName)){
-                case 0:
-                    System.out.println("Exit");
-                    break;
-                default:
-                    if (AddressBookTable.get(addressBookName) == null){
-                        System.out.println("Entered address book name is wrong");
-                        System.out.println("Re-Enter Address book name");
-                        addressBookName = scan.next();
-                    }
-                    else {
-                        Begin();
-                    }
-            }
-        }
-    }
-    void Begin() {
-        int choice = 1;
-        while (choice != 0) {
-            System.out.println("1:Create or Add new Contact\n2:Edit Contact using Person First Name\n3:Delete Contact using Person First Name");
-            System.out.println("4:Create new AddressBook\n0:Exit Program");
-            System.out.println("Enter your choice : ");
-            choice = new UserInputOutput().getint();
-
-            switch (choice){
-                case 1:
-                    AddressBookTable.get(addressBookName).CreateContact();
-                    break;
-                case 2: AddressBookTable.get(addressBookName).EditContactUsingName("Edit");
-                    break;
-                case 3: AddressBookTable.get(addressBookName).EditContactUsingName("Delete");
-                    break;
-                case 4: newAddressBook();
-                    break;
-                case 0:
-                    System.out.println("Exited");
-                    break;
-                default:
-                    System.out.println("Enter correct choice");
-            }
-        }
-    }
-
-    void newAddressBook(){
-        System.out.println("Enter Address book name : ");
-        String Name = scan.next();
-        if(AddressBookTable.containsKey(Name)){
-            System.out.println("Address Book of this name already exits\nUse new name");
-        }
-        else {
-            AddressBookTable.put(Name,new AddressBook());
-            addressBookName = Name;
-        }
-    }
-
-}
-
-class UserInputOutput {
-    int a;
-    public int getint(){
-        try {
-            a = new UserInputOutput().inputint();
-        }
-        catch (InputMismatchException ex){
-            System.out.println("Enter only number");
-            getint();
-        }
-        finally {
-            return a;}
-
-    }
-
-    public int inputint(){
-        Scanner scan = new Scanner(System.in);
-        int value = scan.nextInt();
-        return value;
-    }
-
 }
