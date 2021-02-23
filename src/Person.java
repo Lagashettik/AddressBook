@@ -80,5 +80,8 @@ public class Person {
         return FirstName.equals(person.FirstName) && LastName.equals(person.LastName);
     }
 
-
+    @Override
+    public String toString() {
+        return FirstName +" "+ LastName;
+    }
 }

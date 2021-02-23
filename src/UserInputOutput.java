@@ -6,13 +6,13 @@ public class UserInputOutput {
     public int getint(){
         try {
             a = new UserInputOutput().inputint();
+            return a;
         }
         catch (InputMismatchException ex){
             System.out.println("Enter only number");
             getint();
+            return a;
         }
-        finally {
-            return a;}
 
     }
 

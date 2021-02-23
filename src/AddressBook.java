@@ -121,6 +121,10 @@ public class AddressBook {
         return false;
     }
 
+    ArrayList<Person> getAddressBook(){
+        return addressbook;
+    }
+
 //    void display(){
 //        for (Person person : addressbook){
 //            System.out.println("Firstname : "+person.getFirstName());
