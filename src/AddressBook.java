@@ -140,11 +140,27 @@ public class AddressBook {
     }
 
     void sortByPersonName(){
-        setAddressbook((ArrayList<Person>) getAddressBook().stream().sorted(Comparator.comparing(Person::getFirstName)).collect(Collectors.toList()));
+        setAddressbook((ArrayList<Person>) addressbook.stream().sorted(Comparator.comparing(Person::getFirstName)).collect(Collectors.toList()));
+    }
+
+
+    List<Person> sortByCity() {
+        return addressbook.stream().sorted(Comparator.comparing(Person::getCity)).collect(Collectors.toList());
+    }
+
+    public List<Person> sortByState() {
+        return addressbook.stream().sorted(Comparator.comparing(Person::getState)).collect(Collectors.toList());
+    }
+
+    public List<Person> sortByZip() {
+        return addressbook.stream().sorted(Comparator.comparing(Person::getZip)).collect(Collectors.toList());
     }
 
     public static void display(List<Person> personList){
+        if(personList != null)
         personList.forEach(System.out::println);
+        else
+            System.out.println("No data\nNothing to sort");
     }
     void display(){
         for (Person person : addressbook){
@@ -163,4 +179,5 @@ public class AddressBook {
         AddressBookHashTable addressBookHashTable =new AddressBookHashTable();
         addressBookHashTable.Start();
     }
+
 }

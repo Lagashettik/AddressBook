@@ -45,7 +45,7 @@ public class AddressBookHashTable {
         while (choice != 0) {
             System.out.println("1:Create or Add new Contact\n2:Edit Contact using Person First Name\n3:Delete Contact using Person First Name");
             System.out.println("4:Create new AddressBook\n5:Search person in city or state\n6:Exit Addressbook\n7:View all person by city or state");
-            System.out.println("8:Total count of person by city or state \n0:Exit Program");
+            System.out.println("8:Get count of person by city or state\n9:Sort Entries \n0:Exit Program");
             System.out.println("Enter your choice : ");
             choice = new UserInputOutput().getint();
 
@@ -58,7 +58,7 @@ public class AddressBookHashTable {
                 case 6 -> choice = Start();
                 case 7 -> AddressBook.display(viewByCityOrState());
                 case 8 -> System.out.println(viewByCityOrState().size());
-//                case 9 -> addressBookTable.get(addressBookName).display();
+                case 9 -> sortAddressBook();
                 case 0 -> System.out.println("Exited");
                 default -> System.out.println("Enter correct choice");
             }
@@ -135,6 +135,20 @@ public class AddressBookHashTable {
         }
 
         return personList;
+    }
+
+    void sortAddressBook(){
+        System.out.println("1: City\n2: State\n3: Zip");
+        int choice = new UserInputOutput().getint();
+        List<Person> sortedList = null;
+        switch (choice){
+            case 1 -> sortedList = addressBookTable.get(addressBookName).sortByCity();
+            case 2 -> sortedList = addressBookTable.get(addressBookName).sortByState();
+            case 3 -> sortedList = addressBookTable.get(addressBookName).sortByZip();
+            default -> System.out.println("Incorrect choice");
+        }
+
+        AddressBook.display(sortedList);
     }
 
 }
