@@ -1,9 +1,7 @@
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class AddressBookHashTable {
-    Hashtable<String, AddressBook> addressBookHashtable = new Hashtable<>();    //Table of AddressBook
+    Hashtable<String, AddressBook> addressBookTable = new Hashtable<>();    //Table of AddressBook
     public static Scanner scan = new Scanner(System.in);
     static String addressBookName;
 
@@ -11,34 +9,35 @@ public class AddressBookHashTable {
         System.out.println("Welcome to Address Book Program");
     }
 
-    void Start() {
-        if (addressBookHashtable.isEmpty()) {
+    int Start() {
+        if (addressBookTable.isEmpty()) {
             System.out.println("Enter First Address book name : ");
             addressBookName = scan.next();
-            addressBookHashtable.put(addressBookName, new AddressBook());
+            addressBookTable.put(addressBookName, new AddressBook());
             Begin();
+            return 1;
         } else {
-            checkAddressbook();
+            return checkAddressbook();
         }
     }
 
-    void checkAddressbook() {
+    int checkAddressbook() {
         System.out.println("Enter Existing Address book Name\n Press 0 to exit\n Press 1 to create new Address book");
         addressBookName = scan.next();
-        if (addressBookName.equals("0"))
+        if (addressBookName.equals("0")) {
             System.out.println("Exit");
-
+            return 0;
+        }
         else if (addressBookName.equals("1"))
             newAddressBook();
 
         else {
-            if (addressBookHashtable.get(addressBookName) == null) {
+            if (addressBookTable.get(addressBookName) == null) {
                 System.out.println("Entered address book name is wrong");
                 checkAddressbook();
-            } else {
-                Begin();
-            }
+            } else Begin();
         }
+        return 1;
     }
 
     void Begin() {
@@ -46,38 +45,40 @@ public class AddressBookHashTable {
         while (choice != 0) {
             System.out.println("1:Create or Add new Contact\n2:Edit Contact using Person First Name\n3:Delete Contact using Person First Name");
             System.out.println("4:Create new AddressBook\n5:Search person in city or state\n6:Exit Addressbook\n7:View all person by city or state");
-            System.out.println("8:Total count of person by city or state\n0:Exit Program");
+            System.out.println("8:Total count of person by city or state \n0:Exit Program");
             System.out.println("Enter your choice : ");
             choice = new UserInputOutput().getint();
 
             switch (choice) {
-                case 1 -> addressBookHashtable.get(addressBookName).CreateContact();
-                case 2 -> addressBookHashtable.get(addressBookName).EditContactUsingName("Edit");
-                case 3 -> addressBookHashtable.get(addressBookName).EditContactUsingName("Delete");
+                case 1 -> addressBookTable.get(addressBookName).CreateContact(addressBookName);
+                case 2 -> addressBookTable.get(addressBookName).EditContactUsingName("Edit",addressBookName);
+                case 3 -> addressBookTable.get(addressBookName).EditContactUsingName("Delete",addressBookName);
                 case 4 -> newAddressBook();
                 case 5 -> searchInCityOrState();
-                case 6 -> Start();
-                case 7 -> viewByCityOrState(true);
-                case 8 -> System.out.println(viewByCityOrState(false));
+                case 6 -> choice = Start();
+                case 7 -> AddressBook.display(viewByCityOrState());
+                case 8 -> System.out.println(viewByCityOrState().size());
+//                case 9 -> addressBookTable.get(addressBookName).display();
                 case 0 -> System.out.println("Exited");
                 default -> System.out.println("Enter correct choice");
             }
+            addressBookTable.get(addressBookName).sortByPersonName();
         }
     }
 
     void newAddressBook() {
         System.out.println("Enter new Address book name : ");
         String Name = scan.next();
-        if (addressBookHashtable.containsKey(Name)) {
+        if (addressBookTable.containsKey(Name)) {
             System.out.println("Address Book of this name already exits\nUse new name");
-            addressBookName = Name;
         } else {
-            addressBookHashtable.put(Name, new AddressBook());
+            addressBookTable.put(Name, new AddressBook());
+            addressBookName = Name;
         }
     }
 
     void searchInCityOrState() {
-        Set<String> Keys = addressBookHashtable.keySet();
+        Set<String> Keys = addressBookTable.keySet();
         System.out.println("Enter Person details\nFirst name: ");
         String firstname = scan.next();
         System.out.println("Last name: ");
@@ -86,7 +87,7 @@ public class AddressBookHashTable {
         String location = scan.next();
         boolean check = false;
         for (String key : Keys) {
-            if (addressBookHashtable.get(key).searchInAddressBook(firstname, lastname, location)) {
+            if (addressBookTable.get(key).searchInAddressBook(firstname, lastname, location)) {
                 System.out.println("Person found in " + key + " AddressBook");
                 check = true;
             }
@@ -95,62 +96,45 @@ public class AddressBookHashTable {
             System.out.println("Person not found in all AddressBook");
     }
 
-    int viewByCityOrState(boolean print) {
-        Hashtable<String,List<String>> personTable = new Hashtable<>();
-        Set<String> Keys = addressBookHashtable.keySet();
-        List<String> locations = new ArrayList<>();
+    List<Person> viewByCityOrState() {
         System.out.println("Enter \n1: City\n2: State");
         int choice = 0;
         switch (new UserInputOutput().getint()) {
             case 1 -> {
-                choice = 1;
-                choice = getPersonLocationTable(Keys, locations, personTable, choice, print);
+                System.out.println("Enter City Name : ");
+                return countByCity();
             }
             case 2 -> {
-                choice = 2;
-                choice = getPersonLocationTable(Keys, locations, personTable, choice, print);
+                System.out.println("Enter State Name");
+                return countByState();
             }
-            default -> System.out.println("Enter correct choice");
+            default -> System.out.println("Incorrect choice");
         }
-        return choice;
+        return null;
     }
 
-    int getPersonLocationTable(Set<String> Keys, List<String> locations, Hashtable<String,List<String>> personTable, int choice, boolean print){
-        for(String key : Keys) {
-            if(choice == 1)
-                locations.addAll(addressBookHashtable.get(key).getAddressBook().stream().map(Person::getCity).distinct().collect(Collectors.toList()));
-            else
-                locations.addAll(addressBookHashtable.get(key).getAddressBook().stream().map(Person::getState).distinct().collect(Collectors.toList()));
+    List<Person> countByCity(){
+        String location = scan.next();
+        Set<String> Keys = addressBookTable.keySet();
+        List<Person> personList = new ArrayList<>();
 
-        }
-        locations = locations.stream().distinct().collect(Collectors.toList());
-
-        for(String key : Keys){
-            for(String location : locations) {
-                List<String> personName;
-                if(choice == 1)
-                    personName = addressBookHashtable.get(key).getAddressBook().stream().filter( e -> e.getCity().equals(location)).map(Person::toString).collect(Collectors.toList());
-                else
-                    personName = addressBookHashtable.get(key).getAddressBook().stream().filter( e -> e.getState().equals(location)).map(Person::toString).collect(Collectors.toList());
-
-                personTable.put(location,personName);
-            }
+        for ( String eachkey : Keys) {
+            personList.addAll(addressBookTable.get(eachkey).FindInCity(location));
         }
 
-        int count = 0;
+        return personList;
+    }
 
-        for (String location : locations) {
-            if(print){
-                if (choice == 1)
-                    System.out.println("City : " + location);
-                else
-                    System.out.println("State : " + location);
+    List<Person> countByState(){
+        String location = scan.next();
+        Set<String> Keys = addressBookTable.keySet();
+        List<Person> personList = new ArrayList<>();
 
-                personTable.get(location).forEach(System.out::println);
-            }
-            count += personTable.get(location).size();
+        for ( String eachkey : Keys) {
+            personList.addAll(addressBookTable.get(eachkey).FindInState(location));
         }
-        return count;
+
+        return personList;
     }
 
 }

@@ -1,11 +1,12 @@
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AddressBook {
     public static Scanner scan = new Scanner(System.in);
     private ArrayList<Person> addressbook = new ArrayList<>();
 
-    void CreateContact(){
+    void CreateContact(String addressBookName){
         Person data = new Person();
 
         System.out.println("Enter Following Details: \nFirstName : ");
@@ -14,7 +15,7 @@ public class AddressBook {
         System.out.println("LastName : ");
         data.setLastName(scan.next());
 
-        if (!addressbook.contains(data)) {
+        if (!addressbook.contains(data)){
             System.out.println("Address : ");
             scan.nextLine();
             data.setAddress(scan.nextLine());
@@ -32,18 +33,19 @@ public class AddressBook {
             GetCorrectPhNo(data);
 
             addressbook.add(data);
+            addressbook = (ArrayList<Person>) addressbook.stream().sorted(Comparator.comparing( Person :: getFirstName)).collect(Collectors.toList());
         }
         else
-            System.out.println("Entered Person already exist in this address book");
+            System.out.println("Entered Person already exist in this address book" + addressBookName);
 
     }
 
-    void EditContactUsingName(String Operation){
+    void EditContactUsingName(String Operation, String addressBookName){
         try {
         System.out.println("Enter Person Name : ");
         int Index = CheckPersonIndex(scan.next());
         if(Index == -1)
-            System.out.println("Person Not exist\nCreate contact");
+            System.out.println("Person Not exist in " + addressBookName + "\nCreate contact");
         else
             EditOrDeleteContact(Index,Operation);
         }
@@ -71,6 +73,7 @@ public class AddressBook {
             data.setLastName(scan.next());
 
             System.out.println("Address : ");
+            scan.nextLine();
             data.setAddress(scan.nextLine());
 
             System.out.println("City : ");
@@ -124,19 +127,37 @@ public class AddressBook {
     ArrayList<Person> getAddressBook(){
         return addressbook;
     }
+    void setAddressbook(ArrayList<Person> persons){
+        addressbook = persons;
+    }
 
-//    void display(){
-//        for (Person person : addressbook){
-//            System.out.println("Firstname : "+person.getFirstName());
-//            System.out.println("Lastname : "+person.getLastName());
-//            System.out.println("Address : "+person.getAddress());
-//            System.out.println("City : "+person.getCity());
-//            System.out.println("State : "+person.getState());
-//            System.out.println("Email : "+person.getEmail());
-//            System.out.println("Zip : "+person.getZip());
-//            System.out.println("Phone Number : "+person.getPhNo());
-//        }
-//    }
+    List<Person> FindInCity(String city){
+        return addressbook.stream().filter(e -> e.getCity().equals(city)).collect(Collectors.toList());
+    }
+
+    List<Person> FindInState(String state){
+        return addressbook.stream().filter(e -> e.getState().equals(state)).collect(Collectors.toList());
+    }
+
+    void sortByPersonName(){
+        setAddressbook((ArrayList<Person>) getAddressBook().stream().sorted(Comparator.comparing(Person::getFirstName)).collect(Collectors.toList()));
+    }
+
+    public static void display(List<Person> personList){
+        personList.forEach(System.out::println);
+    }
+    void display(){
+        for (Person person : addressbook){
+            System.out.println("Firstname : "+person.getFirstName());
+            System.out.println("Lastname : "+person.getLastName());
+            System.out.println("Address : "+person.getAddress());
+            System.out.println("City : "+person.getCity());
+            System.out.println("State : "+person.getState());
+            System.out.println("Email : "+person.getEmail());
+            System.out.println("Zip : "+person.getZip());
+            System.out.println("Phone Number : "+person.getPhNo()+"\n");
+        }
+    }
 
     public static void main(String[] args) {
         AddressBookHashTable addressBookHashTable =new AddressBookHashTable();
